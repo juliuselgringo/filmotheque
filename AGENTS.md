@@ -59,12 +59,23 @@
 
 ### ÉTAPE EN COURS — API TMDB (en plusieurs sous-étapes)
 Objectif : remplacer les films en dur par des données de l'API TMDB.
-1. **Clé API** : créer un compte sur https://www.themoviedb.org → Profil → API → demander une clé (lecture seule). À faire par l'utilisateur, ne pas la commiter en clair.
-2. **Activer HttpClient** : dans `src/app/app.config.ts`, ajouter `provideHttpClient()` (import depuis `@angular/common/http`) au tableau `providers`.
-3. **Service** : `ng g s services/tmdb` → classe `@Injectable` qui contiendra les appels HTTP.
-4. Dans le service : `private http = inject(HttpClient);` puis `getFilmsPopulaires() { return this.http.get(...); }` → retourne un **Observable** (rien ne se passe avant `.subscribe()`).
-5. Dans `ListeFilms` : injecter le service, appeler la méthode, `subscribe(...)` pour remplir `films`, afficher avec le `@for` existant.
-Concepts : service `@Injectable` + injection (`inject()`), `provideHttpClient()`, HttpClient, Observable/subscribe.
+Fait : clé API v3 dans `src/environments/environment.local.ts` (gitignoré, vérifié avec `git check-ignore` + `git add --dry-run`), `environment.example.ts` committable, `provideHttpClient()` dans `app.config.ts`, service `ng g s services/tmdb` créé (`src/app/services/tmdb.ts`, `@Injectable({ providedIn: 'root' })` = singleton injectable partout).
+
+Fait : `tmdb.ts` compile (ng build OK) — `inject(HttpClient)`, `getPopularFilms(): Observable<...>` sur `https://api.themoviedb.org/3/movie/popular?api_key=...&language=fr-FR`, clé depuis `environment.local`. Note : TMDB accepte aussi l'auth Bearer v4 (JWT en header `Authorization`) ; la clé v3 en query param suffit pour la lecture.
+
+Fait et fonctionnel : liste des films populaires TMDB affichée (appel 200 OK). `tmdb.ts` : `getPopularFilms(): Observable<TmdbResponse>` avec `http.get<TmdbResponse>(...)` (le générique est obligatoire sinon `Observable<Object>` n'est pas assignable). `liste-films.ts` : `films = signal<Film[]>([])` + `subscribe` dans le constructeur avec mapping (`title`, `release_date.slice(0,4)`, `vote_average`). Template : `@for (film of films(); ...)`. Le `@if`/`[class.chef-doeuvre]` fonctionnent sur les vraies notes.
+**Leçon clé** : app zoneless (Angular 21, pas de zone.js) → une propriété simple modifiée dans un `subscribe` ne rafraîchit PAS la vue ; il faut un `signal` + `.set(...)`. Toujours utiliser des signaux pour les données async.
+Note : certains titres TMDB n'ont pas de traduction fr → titre original (chinois) affiché, c'est normal.
+
+### ÉTAPE SUIVANTE — barre de recherche (expliquée, PAS encore implémentée)
+- `Tmdb.searchFilms(query)` sur `/search/movie?query=...&language=fr-FR` avec `encodeURIComponent(query)`.
+- `ListeFilms` : `query = signal('')` + méthode `rechercher()` qui `subscribe` et fait `films.set(...)`.
+- Template : `<input [value]="query()" (input)="query.set($any($event.target).value)" />` + `<button (click)="rechercher()">Rechercher</button>`.
+Concept : binding d'événement `(click)`/`(input)` (parenthèses = on réagit à l'action utilisateur).
+
+### Suite prévue (pas encore abordé)
+- Routing (`app.routes.ts`) + fiche détail d'un film (`/film/:id`, endpoint `movie/{id}`).
+- Favoris persistés en localStorage.
 
 ### Suite prévue (pas encore abordé)
 - Recherche de films (champ de recherche + appel API `search/movie`).

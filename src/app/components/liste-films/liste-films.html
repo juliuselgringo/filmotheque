@@ -1,9 +1,9 @@
 <h2>Mes films</h2>
 
 <ul>
-    @for (film of films; track film) {
+    @for (film of films(); track film.title) {
         <li [class.chef-doeuvre]="film.note >= 9">
-            {{ film.titre }} ({{ film.annee }}) - {{ film.note }}/10
+            {{ film.title }} ({{ film.year }}) - {{ film.note }}/10
             @if (film.note >= 9) {
                 <strong> - Chef-d'oeuvre</strong>
             }
