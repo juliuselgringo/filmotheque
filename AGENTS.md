@@ -45,22 +45,24 @@
 ### Concepts déjà vus
 - Composant racine (`App`), template, interpolation `{{ }}`, signaux (`signal()`), `protected readonly` (visibilité TS, pas une protection XSS), `<router-outlet />` (point d'insertion du routing, `app.routes.ts` encore vide), sélecteur de composant, génération CLI vs édition manuelle dans VSCode.
 
+### Ce qui est fait et fonctionnel (suite)
+- `liste-films.ts` : `films = ['Inception', 'Interstellar', 'Le Parrain'];` et boucle `@for` dans `liste-films.html` → la liste s'affiche sur localhost:4200. Concept vu : directive structurelle `@for` (boucle dans le template, `track` obligatoire).
+
+### Ce qui est fait et fonctionnel (suite)
+- `liste-films.ts` : `interface Film { titre: string; annee: number; note: number; }` + `films: Film[]` avec 3 films en dur ; `liste-films.html` affiche `{{ film.titre }} ({{ film.annee }}) — {{ film.note }}/10` avec `track film.titre`. Concepts vus : propriétés d'objet dans le template, interface TS. (Piège vu : un décorateur `@Component` doit être immédiatement suivi de sa classe, pas d'une interface → erreur TS1206.)
+
+### Ce qui est fait et fonctionnel (suite)
+- `@if (film.note >= 9)` dans `liste-films.html` : badge « Chef-d'œuvre » affiché uniquement sur Le Parrain (9.2). Concept vu : directive structurelle `@if` (bloc affiché si condition vraie), `@else` existe aussi. (Note : si le serveur « plante », vérifier le terminal ng serve + recharger la page.)
+
 ### ÉTAPE EN COURS — à faire en premier la prochaine fois
-Afficher une liste de films en dur dans `liste-films` (avant l'API TMDB) :
-1. Dans `liste-films.ts`, ajouter : `films = ['Inception', 'Interstellar', 'Le Parrain'];`
-2. Dans `liste-films.html`, remplacer le contenu par une boucle `@for` :
-   ```html
-   <h2>Mes films</h2>
-   <ul>
-     @for (film of films; track film) {
-       <li>{{ film }}</li>
-     }
-   </ul>
-   ```
-3. Vérifier le rendu sur localhost:4200. Concept : directive structurelle `@for` (boucle dans le template, `track` obligatoire).
+Binding de classe `[class.chef-doeuvre]` pour colorer les films notés >= 9 :
+1. `liste-films.html` : `<li [class.chef-doeuvre]="film.note >= 9"> ... </li>`
+2. `liste-films.css` : `.chef-doeuvre { color: darkgreen; font-weight: bold; }` (ou autre style au choix)
+Concept : binding de propriété `[class.nom]="condition"` — la classe CSS est ajoutée/retirée selon le booléen.
 
 ### Suite prévue (pas encore abordé)
-- Bindings d'attributs/propriétés (`[src]`, `[class]`, `[href]`), `@if`.
+- Autres bindings (`[src]`, `[href]`, `[style]`), `@else`.
+- Service + HttpClient pour appeler l'API TMDB (recherche de films) — clé API TMDB à créer et à configurer.
 - Service + HttpClient pour appeler l'API TMDB (recherche de films) — clé API TMDB à créer et à configurer.
 - Routing (`app.routes.ts`) + fiche détail d'un film.
 - Favoris persistés en localStorage.

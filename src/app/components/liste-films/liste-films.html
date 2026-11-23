@@ -1,1 +1,12 @@
-<p>liste-films works!</p>
+<h2>Mes films</h2>
+
+<ul>
+    @for (film of films; track film) {
+        <li>
+            {{ film.titre }} ({{ film.annee }}) - {{ film.note }}/10
+            @if (film.note >= 9) {
+                <strong> - Chef-d'oeuvre</strong>
+            }
+        </li>
+    }
+</ul>
