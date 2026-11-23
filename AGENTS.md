@@ -54,15 +54,22 @@
 ### Ce qui est fait et fonctionnel (suite)
 - `@if (film.note >= 9)` dans `liste-films.html` : badge « Chef-d'œuvre » affiché uniquement sur Le Parrain (9.2). Concept vu : directive structurelle `@if` (bloc affiché si condition vraie), `@else` existe aussi. (Note : si le serveur « plante », vérifier le terminal ng serve + recharger la page.)
 
-### ÉTAPE EN COURS — à faire en premier la prochaine fois
-Binding de classe `[class.chef-doeuvre]` pour colorer les films notés >= 9 :
-1. `liste-films.html` : `<li [class.chef-doeuvre]="film.note >= 9"> ... </li>`
-2. `liste-films.css` : `.chef-doeuvre { color: darkgreen; font-weight: bold; }` (ou autre style au choix)
-Concept : binding de propriété `[class.nom]="condition"` — la classe CSS est ajoutée/retirée selon le booléen.
+### Ce qui est fait et fonctionnel (suite)
+- Binding `[class.chef-doeuvre]="film.note >= 9"` sur le `<li>` + style `.chef-doeuvre` dans `liste-films.css` (CSS scopé au composant). Concepts vus : binding de propriété `[class.x]`, styles scopés.
+
+### ÉTAPE EN COURS — API TMDB (en plusieurs sous-étapes)
+Objectif : remplacer les films en dur par des données de l'API TMDB.
+1. **Clé API** : créer un compte sur https://www.themoviedb.org → Profil → API → demander une clé (lecture seule). À faire par l'utilisateur, ne pas la commiter en clair.
+2. **Activer HttpClient** : dans `src/app/app.config.ts`, ajouter `provideHttpClient()` (import depuis `@angular/common/http`) au tableau `providers`.
+3. **Service** : `ng g s services/tmdb` → classe `@Injectable` qui contiendra les appels HTTP.
+4. Dans le service : `private http = inject(HttpClient);` puis `getFilmsPopulaires() { return this.http.get(...); }` → retourne un **Observable** (rien ne se passe avant `.subscribe()`).
+5. Dans `ListeFilms` : injecter le service, appeler la méthode, `subscribe(...)` pour remplir `films`, afficher avec le `@for` existant.
+Concepts : service `@Injectable` + injection (`inject()`), `provideHttpClient()`, HttpClient, Observable/subscribe.
 
 ### Suite prévue (pas encore abordé)
-- Autres bindings (`[src]`, `[href]`, `[style]`), `@else`.
-- Service + HttpClient pour appeler l'API TMDB (recherche de films) — clé API TMDB à créer et à configurer.
+- Recherche de films (champ de recherche + appel API `search/movie`).
+- Routing (`app.routes.ts`) + fiche détail d'un film.
+- Favoris persistés en localStorage.
 - Service + HttpClient pour appeler l'API TMDB (recherche de films) — clé API TMDB à créer et à configurer.
 - Routing (`app.routes.ts`) + fiche détail d'un film.
 - Favoris persistés en localStorage.
