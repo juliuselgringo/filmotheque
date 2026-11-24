@@ -1,12 +1,21 @@
+<input 
+    type="text"
+    placeholder="Rechercher un film ..."
+    [value]="query()"
+    (input)="query.set($any($event.target).value)"    
+/>
+<button (click)="search()">Rechercher</button>
+
 <h2>Mes films</h2>
 
 <ul>
     @for (film of films(); track film.title) {
         <li [class.chef-doeuvre]="film.note >= 9">
-            {{ film.title }} ({{ film.year }}) - {{ film.note }}/10
+            <a [routerLink]="['/film', film.id]">{{ film.title }} ({{ film.year }}) - {{ film.note }}/10</a>
             @if (film.note >= 9) {
                 <strong> - Chef-d'oeuvre</strong>
             }
         </li>
     }
 </ul>
+

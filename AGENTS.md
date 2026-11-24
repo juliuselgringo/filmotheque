@@ -67,15 +67,22 @@ Fait et fonctionnel : liste des films populaires TMDB affichée (appel 200 OK). 
 **Leçon clé** : app zoneless (Angular 21, pas de zone.js) → une propriété simple modifiée dans un `subscribe` ne rafraîchit PAS la vue ; il faut un `signal` + `.set(...)`. Toujours utiliser des signaux pour les données async.
 Note : certains titres TMDB n'ont pas de traduction fr → titre original (chinois) affiché, c'est normal.
 
-### ÉTAPE SUIVANTE — barre de recherche (expliquée, PAS encore implémentée)
-- `Tmdb.searchFilms(query)` sur `/search/movie?query=...&language=fr-FR` avec `encodeURIComponent(query)`.
-- `ListeFilms` : `query = signal('')` + méthode `rechercher()` qui `subscribe` et fait `films.set(...)`.
-- Template : `<input [value]="query()" (input)="query.set($any($event.target).value)" />` + `<button (click)="rechercher()">Rechercher</button>`.
-Concept : binding d'événement `(click)`/`(input)` (parenthèses = on réagit à l'action utilisateur).
+### Ce qui est fait et fonctionnel (suite)
+- **Recherche fonctionnelle** : `Tmdb.searchFilms(query)` sur `/search/movie?query=${encodeURIComponent(query)}...` (piège vu : dans un template literal, l'interpolation s'écrit `${...}` — sans le `$`, la valeur n'est pas interpolée → 401). `ListeFilms` : `query = signal('')`, méthode `search()` avec `subscribe` → `films.set(...)`. Template : `<input [value]="query()" (input)="query.set($any($event.target).value)" />` + `<button (click)="search()">`. Concept vu : binding d'événement `(input)`/`(click)`. Note : `search/movie` fait une recherche full-text (titre + synopsis + titres traduits) → des résultats sans le mot dans le titre sont normaux ; `vote_average: 0` = aucun vote ; `release_date` vide → année 0.
+
+### Ce qui est fait et fonctionnel (suite)
+- **Routing + fiche détail fonctionnels** : `app.routes.ts` = `{ path: '', component: ListeFilms }` + `{ path: 'film/:id', component: FicheFilm }`. `app.html` ne contient plus que le `<h1>` + `<router-outlet />` (piège vu : un composant en dur à côté de l'outlet n'est jamais remplacé par le routing). Liste : `<a [routerLink]="['/film', film.id]">` (interface `Film` a maintenant `id: number`, `RouterLink` dans les imports). `FicheFilm` : `inject(ActivatedRoute).snapshot.paramMap.get('id')` + `tmdb.getFilmDetails(id)` (`/movie/{id}`) + `film = signal<TmdbMovie | null>(null)`, template `@if (film(); as f) { ... }` avec `overview`. Types TMDB : `TmdbMovie` (un film) vs `TmdbResponse` (enveloppe `{ results: TmdbMovie[] }` des endpoints de liste).
+Concepts vus : routing (`app.routes.ts`, `provideRouter`, `routerLink` SPA sans rechargement), paramètre d'URL `:id`, `ActivatedRoute`, `as` dans `@if`.
+
+### ÉTAPE SUIVANTE — favoris persistés en localStorage (expliquée, PAS encore implémentée)
+- Service `ng g s services/favoris` : `favoris = signal<number[]>(JSON.parse(localStorage.getItem('favoris') ?? '[]'))`, méthodes `toggle(id)` / `estFavori(id)` qui mettent à jour le signal ET `localStorage.setItem('favoris', JSON.stringify(...))`.
+- Bouton « ★ » sur chaque film (liste et/ou fiche) avec `(click)`.
+- Page `/favoris` (route + composant) qui filtre la liste via `Tmdb` ou affiche les favoris.
+Concepts : `localStorage` (persistance côté client), service d'état partagé (singleton `providedIn: 'root'` + signal lu par plusieurs composants).
 
 ### Suite prévue (pas encore abordé)
-- Routing (`app.routes.ts`) + fiche détail d'un film (`/film/:id`, endpoint `movie/{id}`).
-- Favoris persistés en localStorage.
+- Affichage des affiches (`poster_path` → `https://image.tmdb.org/t/p/w500/...` avec `[src]`).
+- Améliorations diverses (année `0` quand `release_date` vide, pagination, etc.).
 
 ### Suite prévue (pas encore abordé)
 - Recherche de films (champ de recherche + appel API `search/movie`).

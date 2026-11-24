@@ -1,3 +1,27 @@
+h2{
+    text-align: center;
+}
+
+input{
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    border-radius: 5px;
+}
+
+button{
+    margin: auto;
+    display: flex;
+    margin-top: 5px;
+    border-radius: 5px;
+    background-color: var(--var-secondaire);
+}
+
+ul{
+    margin-left: 20vw;
+}
+
 .chef-doeuvre {
     color: darkgreen;
     font-weight: bold;
