@@ -20,6 +20,20 @@ button{
 
 ul{
     margin-left: 20vw;
+    display: inline;
+    list-style: none;
+}
+
+li{
+    border: 1px solid grray;
+    border-radius: 5px;
+    margin:5px;
+    padding: 5px;
+    background-color: gray;
+}
+
+a{
+    color:white;
 }
 
 .chef-doeuvre {

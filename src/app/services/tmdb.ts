@@ -41,4 +41,8 @@ export class Tmdb {
       `${this.baseUrl}/movie/${id}?api_key=${this.apiKey}&language=fr-FR`
     );
   }
+
+  imageUrl(path: string | null, size = 'w300'): string {
+    return path ? `https://image.tmdb.org/t/p/${size}${path}` : '';
+  }
 }

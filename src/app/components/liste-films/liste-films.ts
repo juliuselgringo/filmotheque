@@ -1,12 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
 import { Tmdb } from '../../services/tmdb';
 import { RouterLink } from '@angular/router';
+import { Favoris } from '../../services/favoris';
 
 interface Film {
     id: number,
     title: string;
     year: number;
     note: number;
+    poster: string;
 }
 
 @Component({
@@ -18,6 +20,8 @@ interface Film {
 
 export class ListeFilms {
   private readonly tmdb = inject(Tmdb);
+
+  public readonly favoris = inject(Favoris);
 
   films = signal<Film[]>([]);
 
@@ -31,6 +35,7 @@ export class ListeFilms {
           title: m.title,
           year: Number(m.release_date.slice(0, 4)),
           note: m.vote_average,
+          poster: this.tmdb.imageUrl(m.poster_path),
         }))
       );
     });
@@ -44,6 +49,7 @@ export class ListeFilms {
           title: m.title,
           year: Number(m.release_date.slice(0, 4)),
           note: m.vote_average,
+          poster: this.tmdb.imageUrl(m.poster_path),
         })
         )
       )

@@ -11,10 +11,14 @@
 <ul>
     @for (film of films(); track film.title) {
         <li [class.chef-doeuvre]="film.note >= 9">
+            @if (film.poster) {
+                <img [src]="film.poster" [alt]="film.title" />
+            }
             <a [routerLink]="['/film', film.id]">{{ film.title }} ({{ film.year }}) - {{ film.note }}/10</a>
             @if (film.note >= 9) {
                 <strong> - Chef-d'oeuvre</strong>
             }
+            <button (click)="favoris.toggle(film.id)">{{ favoris.isFavorites(film.id) ? '★' : '☆' }}</button>
         </li>
     }
 </ul>
