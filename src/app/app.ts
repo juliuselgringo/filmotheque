@@ -4,7 +4,7 @@ import { ListeFilms } from './components/liste-films/liste-films';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ListeFilms],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
