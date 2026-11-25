@@ -74,14 +74,18 @@ Note : certains titres TMDB n'ont pas de traduction fr → titre original (chino
 - **Routing + fiche détail fonctionnels** : `app.routes.ts` = `{ path: '', component: ListeFilms }` + `{ path: 'film/:id', component: FicheFilm }`. `app.html` ne contient plus que le `<h1>` + `<router-outlet />` (piège vu : un composant en dur à côté de l'outlet n'est jamais remplacé par le routing). Liste : `<a [routerLink]="['/film', film.id]">` (interface `Film` a maintenant `id: number`, `RouterLink` dans les imports). `FicheFilm` : `inject(ActivatedRoute).snapshot.paramMap.get('id')` + `tmdb.getFilmDetails(id)` (`/movie/{id}`) + `film = signal<TmdbMovie | null>(null)`, template `@if (film(); as f) { ... }` avec `overview`. Types TMDB : `TmdbMovie` (un film) vs `TmdbResponse` (enveloppe `{ results: TmdbMovie[] }` des endpoints de liste).
 Concepts vus : routing (`app.routes.ts`, `provideRouter`, `routerLink` SPA sans rechargement), paramètre d'URL `:id`, `ActivatedRoute`, `as` dans `@if`.
 
-### ÉTAPE SUIVANTE — favoris persistés en localStorage (expliquée, PAS encore implémentée)
-- Service `ng g s services/favoris` : `favoris = signal<number[]>(JSON.parse(localStorage.getItem('favoris') ?? '[]'))`, méthodes `toggle(id)` / `estFavori(id)` qui mettent à jour le signal ET `localStorage.setItem('favoris', JSON.stringify(...))`.
-- Bouton « ★ » sur chaque film (liste et/ou fiche) avec `(click)`.
-- Page `/favoris` (route + composant) qui filtre la liste via `Tmdb` ou affiche les favoris.
-Concepts : `localStorage` (persistance côté client), service d'état partagé (singleton `providedIn: 'root'` + signal lu par plusieurs composants).
+### Ce qui est fait et fonctionnel (suite)
+- **Favoris (service + bouton) fonctionnels** : `services/favoris.ts` = `favoris = signal<number[]>(JSON.parse(localStorage.getItem('favoris') ?? '[]'))`, méthodes `toggle(id)` / `isFavorites(id)` (signal + `localStorage.setItem`). Bouton ★/☆ dans chaque `<li>` de la liste. Concept vu : localStorage (chaînes uniquement → JSON.stringify/parse) + service d'état partagé (singleton `providedIn: 'root'`, signal lu par plusieurs composants).
+- **Affiches affichées** : `Tmdb.imageUrl(path, size)` → `https://image.tmdb.org/t/p/${size}${path}` (taille choisie : w300), mapping `poster: tmdb.imageUrl(m.poster_path)`, template `<img [src]="film.poster" [alt]="film.title" />` avec `@if (film.poster)` (poster_path peut être null). Piège vu : `src="film.poster"` (attribut statique) ne marche pas, il faut le binding `[src]`.
+- CSS perso en cours dans `liste-films.css` (à retravailler ensemble : coquilles vues `grray`, `word-wrap: ;` vide).
+
+### ÉTAPE SUIVANTE — page `/favoris` (expliquée, PAS encore implémentée)
+- `ng g c components/page-favoris` ; route `{ path: 'favoris', component: PageFavoris }` dans `app.routes.ts` + lien dans `app.html`.
+- `PageFavoris` : lit `favoris.favoris()` (ids), appelle `tmdb.getFilmDetails(id)` pour chaque id (ex. `forkJoin` de rxjs) → `films = signal<TmdbMovie[]>([])`, affiche comme la liste (avec `[src]` affiche, lien vers la fiche).
+Concept : page alimentée par l'état localStorage + appels API par id.
 
 ### Suite prévue (pas encore abordé)
-- Affichage des affiches (`poster_path` → `https://image.tmdb.org/t/p/w500/...` avec `[src]`).
+- Session cosmétique CSS globale (variables, layout) — l'utilisateur a déjà commencé du CSS perso.
 - Améliorations diverses (année `0` quand `release_date` vide, pagination, etc.).
 
 ### Suite prévue (pas encore abordé)

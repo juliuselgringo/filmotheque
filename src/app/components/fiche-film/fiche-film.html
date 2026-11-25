@@ -1,4 +1,7 @@
 @if (film(); as f) {
+    @if (f.poster_path) {
+        <img [src]="imageUrl(f.poster_path)" alt="f.title"/>
+    }
     <h2>{{ f.title }} ({{ f.release_date.slice(0, 4) }})</h2>
     <p>{{ f.overview }}</p>
 }

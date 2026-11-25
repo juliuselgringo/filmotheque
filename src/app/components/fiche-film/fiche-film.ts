@@ -19,4 +19,8 @@ export class FicheFilm {
       this.film.set(f);
     })
   }
+
+  imageUrl(path: string | null, size = 'w300'): string {
+    return path ? `https://image.tmdb.org/t/p/${size}${path}` : '';
+  }
 }
